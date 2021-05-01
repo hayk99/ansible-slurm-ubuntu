@@ -1,0 +1,24 @@
+---
+#rollback task file
+
+- name: Uninstalling slurm pacakges
+  become: true
+  apt:
+    name: "{{ uninstall_pacakges }}"
+    force: yes
+    state: absent
+  # with_items: "{{ uninstall_pacakges }}"
+
+- name: Delete user slurm
+  become: true
+  user:
+    name: 'slurm'
+    state: absent
+    remove: yes
+
+- name: Delete user slurm
+  become: true
+  group:
+    name: 'slurm'
+    state: absent
+  register: rollbackDone

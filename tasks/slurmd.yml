@@ -1,0 +1,40 @@
+---
+#slurm daemon node task file
+
+
+- name: Install Slurm controller package
+  become: yes
+  package:
+    name: "{{ slurm_packages.slurmd }}"
+    state: "{{ 'latest' if slurm_upgrade == 'yes' else 'present' }}"
+
+
+- name: Create slurmd spool directory
+  become: yes
+  file:
+    path: "{{ slurmd_spool_dir }}"
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+
+- name: Create slurmd log directory
+  become: yes
+  file:
+    path: "{{ slurmctld_log_dir }}"
+    owner: "slurm"
+    group: "slurm"
+    mode: 0755
+    state: directory
+  notify: reload slurmd
+
+- name: Get /etc/slurm-llnl stat
+  become: yes
+  stat:
+    path: "{{ slurmd_config_dir }}"
+  register: slurmpath
+
+- name: Check if slurm-llnl exists 
+  become: yes
+  fail: msg= "path {{ slurmd_config_dir }} not exists"
+  when: not slurmpath.stat.exists

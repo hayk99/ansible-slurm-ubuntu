@@ -1,2 +1,44 @@
 ---
-# tasks file for ansible-slurm-ubuntu
+# main file for tasks
+
+- name: Rolling Back
+  include_tasks: rollback.yml 
+  when: rollback is defined
+
+- name: Stopping slurm_roles
+  fail: 
+    msg: "THIS FAIL IS INTENTIONED. ROLE STOPPED BECAUSE OF ROLLBACK"
+  when: "rollbackDone is defined"
+  
+- name: Include user creation task
+  include_tasks: user.yml
+
+- name: Include slurmctld node configuration
+  include_tasks: slurmctld.yml
+  when: "'controller' in slurm_roles"
+
+- name: Include slurmd node configuration
+  include_tasks: slurmd.yml
+  when: "'compute' in slurm_roles"
+
+- name: Include common configuration for all nodes
+  include_tasks: allnodes.yml
+
+
+- name: Check slurmctld is enabled and running
+  become: yes
+  service:
+    name: "{{ slurmctld_service }}"
+    enabled: yes
+    state: started
+  when: "'controller' in slurm_roles"
+
+- name: Check slurmd is enabled and running
+  become: yes
+  service:
+    name: "{{ slurmd_service }}"
+    enabled: yes
+    state: started
+  when: "'compute' in slurm_roles"
+
+

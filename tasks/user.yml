@@ -1,0 +1,56 @@
+---
+#user creation task for munge and slurm
+
+# update_password: `always" will update passwords if they differ. 
+
+- name: Crete slurm group
+  become: true
+  group:
+    name: "slurm"
+    gid: "1110"
+
+- name: Create slurm user
+  become: true
+  user:
+    name: "slurm"
+    uid: "1110"
+    group: "slurm"
+    home: "/var/lib/slurm"
+    shell: "/bin/bash"
+
+# - name: Crete munge group
+#   become: true
+#   group:
+#     name: "munge"
+#     gid: "1120"
+#     system: "yes"
+
+# - name: Stop munge
+#   become: yes
+#   service: 
+#     name: munge
+#     state: stopped
+
+# - name: Change munge user uid
+#   become: true
+#   user: 
+#     name: munge
+#     state: present
+#     uid: 1120
+
+# - name: Change munge group gid
+#   become: true
+#   group: 
+#     name: munge
+#     state: present
+#     gid: 1120
+
+# - name: Create munge user
+#   become: true
+#   user:
+#     name: "munge"
+#     uid: "1120"
+#     group: "munge"
+#     home: "/var/lib/munge"
+#     shell: "/bin/bash"
+#   notify: Restarting munge daemon

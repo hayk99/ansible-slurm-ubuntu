@@ -1,2 +1,38 @@
 ---
 # defaults file for ansible-slurm-ubuntu
+
+slurm_upgrade: 'no'
+
+
+#packages
+slurm_packages:
+  slurmctld: [slurm-wlm]
+  slurmd: [slurm-wlm]
+  client: [slurm-wlm-doc, slurm-client]
+
+uninstall_pacakges: 
+  - slurm-client
+  - slurm-wlm-basic-plugins
+  - slurm-wlm-doc
+  - slurm-wlm
+  - slurmctld
+  - slurmd
+  - munge
+  - libmunge2
+
+
+#directories
+slurmctld_state_dir: '/var/lib/slurm-llnl/slurmctld'
+slurmctld_log_dir: '/var/log/slurm-llnl/slurmctld.log'
+
+slurmd_spool_dir: '/var/lib/slurm-llnl/slurmd'
+slurmd_log_dir: '/var/log/slurm-llnl/slurmd.log'
+
+slurmd_config_dir: '/etc/slurm-llnl'
+munge_config_dir: '/etc/munge'
+
+
+# daemons
+slurmd_service: slurmd
+slurmctld_service: slurmctld
+slurmdbd_service: slurmdbd

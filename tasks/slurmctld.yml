@@ -1,0 +1,40 @@
+---
+# controler node task
+
+- name: Install Slurm controller package
+  become: true
+  package:
+    name: "{{ slurm_packages.slurmctld }}"
+    update_cache: true
+    cache_valid_time: 3600
+    state: "{{ 'latest' if slurm_upgrade == 'yes' else 'present' }}"
+
+- name: Create slurm state directory
+  become: true
+  file:
+    path: "{{ slurmctld_state_dir }}"
+    owner: "slurm"
+    group: "slurm"
+    mode: 0700
+    state: directory
+
+- name: Create slurmctld log directory
+  become: true
+  file:
+    path: "{{ slurmctld_log_dir }}"
+    owner: "slurm"
+    group: "slurm"
+    mode: 0755
+    state: directory
+  notify: reload slurmctld
+
+- name: Get /etc/slurm-llnl stat
+  become: true
+  stat:
+    path: "{{ slurmd_config_dir }}"
+  register: slurmpath
+
+- name: Check if slurm-llnl exists 
+  become: true
+  fail: msg= "path {{ slurmd_config_dir }} not exists"
+  when: not slurmpath.stat.exists

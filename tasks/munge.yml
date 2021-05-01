@@ -1,0 +1,48 @@
+---
+# install munge task 
+
+- name: Install munge
+  become: true
+  apt:
+    update_cache: yes
+    name: 'munge'
+    state: present
+
+# - name: Check munge dir permision
+#   become: true
+#   file:
+#     path: "{{ item.src }}"
+#     recurse: yes
+#     owner: "munge"
+#     group: "munge"
+#     mode: 0700
+#     state: directory
+#   with_items: 
+#     - {src: '/etc/munge'}
+#     - {src: '/var/log/munge'}
+#     - {src: '/var/run/munge'}
+#     - {src: '/var/lib/munge'}
+
+# - name: Check munge log file dir permision
+#   become: true
+#   file:
+#     path: '/var/log/munge/munged.log'
+#     state: file
+#     mode: 0640
+
+- name: Install munge key
+  become: true
+  copy:
+    src: "{{ slurm_munge_key }}"
+    dest: /etc/munge/munge.key
+    owner: "munge"
+    group: "munge"
+    mode: 0400
+  when: slurm_munge_key is defined
+
+- name: Check Munge is enabled and running
+  service:
+    name: munge
+    enabled: yes
+    state: started
+

@@ -1,2 +1,27 @@
 ---
 # handlers file for ansible-slurm-ubuntu
+
+- name: reload slurmd
+  service:
+    name: "{{ slurmd_service }}"
+    state: reloaded
+
+- name: reload slurmctld
+  service:
+    name: "{{ slurmctld_service }}"
+    state: reloaded
+
+- name: reload slurmdbd
+  service:
+    name: "{{ slurmdbd_service }}"
+    state: reloaded
+
+- name: Stop munge
+  service: 
+    name: mungd
+    state: stopped
+
+- name: Restarting munge daemon
+  service: 
+    name: munge
+    state: restarted

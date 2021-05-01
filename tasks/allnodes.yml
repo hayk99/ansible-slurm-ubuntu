@@ -1,0 +1,53 @@
+---
+# this task file is for all nodes
+
+- name: Install Slurm common packages
+  become: true
+  package:
+    name: "{{ slurm_packages.client }}"
+    state: "{{ 'latest' if slurm_upgrade == 'yes' else 'present' }}"
+
+- name: Get /etc/slurm-llnl stat
+  become: true
+  stat:
+    path: "{{ slurmd_config_dir }}"
+  register: slurmpath
+
+- name: Check if slurm-llnl exists 
+  become: true
+  fail: msg= "path {{ slurmd_config_dir }} not exists"
+  when: not slurmpath.stat.exists
+
+- name: Place slurm.conf file
+  become: true
+  template: 
+    src: slurm.conf
+    dest: "{{slurmd_config_dir}}/slurm.conf"
+    owner: root
+    group: root
+    mode: 0444
+  notify: 
+    - reload slurmd
+    - reload slurmctld
+
+- name: Check munge directory exists
+  become: true
+  file:
+    path: "{{ munge_config_dir }}"
+    owner: munge
+    group: munge
+    mode: 0700
+    state: directory
+
+- name: Munge compy key
+  become: true
+  copy:
+    src: "{{ slurm_munge_key }}"
+    dest: /etc/munge/munge.key
+    owner: munge
+    group: munge
+    mode: 0400
+  when: slurm_munge_key is defined
+
+- name: Run munge tasks
+  include_tasks: munge.yml
